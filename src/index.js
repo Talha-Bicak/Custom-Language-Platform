@@ -1,54 +1,64 @@
-// Kelime koleksiyonu için temel veri yapısı
-class VocabularyCollection {
+import './components/WordCard.js';
+import './components/WordList.js';
+import WordService from './services/wordService.js';
+
+class App {
   constructor() {
-    this.words = new Map();
+    this.wordService = new WordService();
+    this.wordList = document.querySelector('word-list');
+    this.setupEventListeners();
   }
 
-  // Yeni kelime ekleme
-  addWord(word, translation, context = '') {
-    this.words.set(word, {
-      translation,
-      context,
-      dateAdded: new Date(),
-      reviewCount: 0,
-      lastReviewed: null
+  setupEventListeners() {
+    // Kelime ekleme olayını dinleme
+    this.wordList.addEventListener('wordAdded', async (e) => {
+      try {
+        const wordData = e.detail;
+        await this.wordService.addWord(
+          wordData.word,
+          wordData.translation,
+          wordData.context
+        );
+        this.updateWordList();
+      } catch (error) {
+        console.error('Kelime eklenirken hata:', error);
+      }
+    });
+
+    // Kelime silme olayını dinleme
+    this.wordList.addEventListener('deleteWord', async (e) => {
+      try {
+        const { word } = e.detail;
+        await this.wordService.deleteWord(word);
+        this.updateWordList();
+      } catch (error) {
+        console.error('Kelime silinirken hata:', error);
+      }
+    });
+
+    // Kelime düzenleme olayını dinleme
+    this.wordList.addEventListener('editWord', async (e) => {
+      try {
+        const wordData = e.detail;
+        await this.wordService.updateWord(wordData.word, wordData);
+        this.updateWordList();
+      } catch (error) {
+        console.error('Kelime güncellenirken hata:', error);
+      }
     });
   }
 
-  // Kelime getirme
-  getWord(word) {
-    return this.words.get(word);
-  }
-
-  // Kelime listesi
-  getAllWords() {
-    return Array.from(this.words.entries()).map(([word, details]) => ({
-      word,
-      ...details
-    }));
-  }
-
-  // Tekrar için kelime seçme
-  getWordsForReview(count = 10) {
-    return this.getAllWords()
-      .sort((a, b) => {
-        if (!a.lastReviewed) return -1;
-        if (!b.lastReviewed) return 1;
-        return a.lastReviewed - b.lastReviewed;
-      })
-      .slice(0, count);
+  async updateWordList() {
+    try {
+      const words = await this.wordService.getAllWords();
+      this.wordList.updateWords(words);
+    } catch (error) {
+      console.error('Kelime listesi güncellenirken hata:', error);
+    }
   }
 }
 
-// Örnek kullanım
-const vocabulary = new VocabularyCollection();
-
-// Kelime ekleme örnekleri
-vocabulary.addWord('ephemeral', 'geçici', 'The ephemeral nature of social media fame.');
-vocabulary.addWord('ubiquitous', 'her yerde bulunan', 'Smartphones have become ubiquitous in modern life.');
-
-// Kelimeleri listeleme
-console.log('Tüm Kelimeler:', vocabulary.getAllWords());
-
-// Tekrar için kelime getirme
-console.log('Tekrar İçin Kelimeler:', vocabulary.getWordsForReview(5));
+// Uygulama başlatma
+document.addEventListener('DOMContentLoaded', () => {
+  new App();
+});

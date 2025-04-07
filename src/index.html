@@ -5,33 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocably - Kelime Öğrenme Aracı</title>
     <link rel="stylesheet" href="styles/main.css">
+    <script type="module" src="index.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Vocably</h1>
-        
-        <!-- Kelime Ekleme Formu -->
-        <div class="form-group">
-            <input type="text" id="wordInput" class="input" placeholder="Yeni kelime">
-            <input type="text" id="translationInput" class="input" placeholder="Çevirisi">
-            <input type="text" id="contextInput" class="input" placeholder="Örnek cümle">
-            <button id="addWordBtn" class="button">Kelime Ekle</button>
-        </div>
+        <header class="header">
+            <h1>Vocably</h1>
+            <p class="subtitle">Kişisel Kelime Öğrenme Asistanı</p>
+        </header>
 
-        <!-- Kelime Listesi -->
-        <div id="wordList">
-            <!-- Kelimeler JavaScript ile buraya eklenecek -->
-        </div>
+        <main class="main-content">
+            <!-- Kelime listesi bileşeni -->
+            <word-list></word-list>
+        </main>
 
-        <!-- Tekrar Bölümü -->
-        <div id="reviewSection">
-            <h2>Tekrar için Kelimeler</h2>
-            <div id="reviewList">
-                <!-- Tekrar kelimeleri JavaScript ile buraya eklenecek -->
-            </div>
-        </div>
+        <footer class="footer">
+            <p>© 2024 Vocably. Tüm hakları saklıdır.</p>
+        </footer>
     </div>
-
-    <script src="index.js"></script>
 </body>
 </html>
