@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocably - Kelime Öğrenme Aracı</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Vocably</h1>
+        
+        <!-- Kelime Ekleme Formu -->
+        <div class="form-group">
+            <input type="text" id="wordInput" class="input" placeholder="Yeni kelime">
+            <input type="text" id="translationInput" class="input" placeholder="Çevirisi">
+            <input type="text" id="contextInput" class="input" placeholder="Örnek cümle">
+            <button id="addWordBtn" class="button">Kelime Ekle</button>
+        </div>
+
+        <!-- Kelime Listesi -->
+        <div id="wordList">
+            <!-- Kelimeler JavaScript ile buraya eklenecek -->
+        </div>
+
+        <!-- Tekrar Bölümü -->
+        <div id="reviewSection">
+            <h2>Tekrar için Kelimeler</h2>
+            <div id="reviewList">
+                <!-- Tekrar kelimeleri JavaScript ile buraya eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
