@@ -1,6 +1,6 @@
 # Kişisel Dil Öğrenme Asistanı
 
-Bu proje, dil öğrenme sürecini daha etkili ve verimli hale getirmeyi amaçlayan kişisel bir dil öğrenme asistanıdır. Kullanıcıların kelime hazinelerini geliştirmelerine ve yeni dil becerilerini pekiştirmelerine yardımcı olur.
+Bu proje, IELTS, TOEFL ve YDS gibi sınavlara hazırlanan öğrenciler için özel olarak tasarlanmış, yapay zeka destekli dil öğrenme platformudur. Kullanıcılar, sınavlarının gereksinimlerine uygun içeriklere ulaşarak dil becerilerini geliştirirken, yapay zeka tarafından üretilen cümle örnekleri ve kelime kullanım analizleri sayesinde kendilerine özgü öğrenme stratejileri oluşturabileceklerdir. Platform, mobil ve web ortamında, cross platform desteğiyle öğrencilerin her yerden erişimine imkan tanıyacaktır.
 
 ## İlk Hafta Yapılanlar
 
