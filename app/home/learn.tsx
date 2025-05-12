@@ -1,41 +1,55 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAuth } from '@/contexts/AuthContext';
 
-// Örnek kelime verileri
-const vocabularyItems = [
-  { id: '1', word: 'Pervasive', meaning: 'Yaygın, her yerde bulunan', example: 'The pervasive influence of social media affects our daily lives.' },
-  { id: '2', word: 'Ubiquitous', meaning: 'Her yerde bulunan', example: 'Mobile phones are ubiquitous in modern society.' },
-  { id: '3', word: 'Profound', meaning: 'Derin, köklü', example: 'The discovery had profound implications for the field of medicine.' },
-  { id: '4', word: 'Mitigate', meaning: 'Hafifletmek, azaltmak', example: 'Measures were taken to mitigate the effects of the flood.' },
-  { id: '5', word: 'Versatile', meaning: 'Çok yönlü', example: 'She is a versatile actress who can perform in various genres.' },
-  { id: '6', word: 'Benevolent', meaning: 'Hayırsever', example: 'The benevolent donor gave millions to charity.' },
-  { id: '7', word: 'Trajectory', meaning: 'Yörünge, yol', example: 'The company\'s trajectory suggests continued growth in the future.' },
-  { id: '8', word: 'Paradigm', meaning: 'Örnek, model', example: 'This discovery represents a paradigm shift in our understanding.' },
-];
+// JSON dosyalarını import et
+import ieltsWords from '@/data/vocabulary/ielts.json';
+import toeflWords from '@/data/vocabulary/toefl.json';
+import ydsWords from '@/data/vocabulary/yds.json';
+import generalWords from '@/data/vocabulary/general.json';
 
 // Kategori tipleri
 const categories = [
-  { id: '1', name: 'IELTS' },
-  { id: '2', name: 'TOEFL' },
-  { id: '3', name: 'YDS' },
-  { id: '4', name: 'Genel' },
+  { id: '1', name: 'IELTS', words: ieltsWords.words },
+  { id: '2', name: 'TOEFL', words: toeflWords.words },
+  { id: '3', name: 'YDS', words: ydsWords.words },
+  { id: '4', name: 'Genel', words: generalWords.words },
 ];
 
 export default function LearnScreen() {
   const colorScheme = useColorScheme();
   const [selectedCategory, setSelectedCategory] = useState('1');
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [vocabularyItems, setVocabularyItems] = useState([]);
+
+  useEffect(() => {
+    const category = categories.find(c => c.id === selectedCategory);
+    if (category) {
+      setVocabularyItems(category.words);
+    }
+  }, [selectedCategory]);
 
   const toggleExpand = (id: string) => {
     setExpandedItem(expandedItem === id ? null : id);
   };
 
+  const { saveWord, savedWords } = useAuth();
+
+  const handleSaveWord = async (item: any) => {
+    const wordToSave = {
+      ...item,
+      category: categories.find(c => c.id === selectedCategory)?.name || 'Genel'
+    };
+    await saveWord(wordToSave);
+  };
+
+  // Render kısmında kaydet butonunu güncelleyelim
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
@@ -114,9 +128,18 @@ export default function LearnScreen() {
                       <ThemedText style={styles.actionText}>Dinle</ThemedText>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity style={styles.actionButton}>
-                      <Ionicons name="bookmark-outline" size={20} color={Colors[colorScheme ?? 'light'].tint} />
-                      <ThemedText style={styles.actionText}>Kaydet</ThemedText>
+                    <TouchableOpacity 
+                      style={styles.actionButton}
+                      onPress={() => handleSaveWord(item)}
+                    >
+                      <Ionicons 
+                        name={savedWords.some(w => w.id === item.id) ? "bookmark" : "bookmark-outline"} 
+                        size={20} 
+                        color={Colors[colorScheme ?? 'light'].tint} 
+                      />
+                      <ThemedText style={styles.actionText}>
+                        {savedWords.some(w => w.id === item.id) ? 'Kaydedildi' : 'Kaydet'}
+                      </ThemedText>
                     </TouchableOpacity>
                   </View>
                 </View>

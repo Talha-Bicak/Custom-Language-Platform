@@ -46,12 +46,25 @@ export default function HomeLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="profile-tab"
         options={{
           title: 'Profil',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+        }}
+      />
+      {/* Gizli ekranlar - Tab bar'da gösterilmeyecek */}
+      <Tabs.Screen
+        name="saved"
+        options={{
+          href: null, // Bu ekranı tab bar'da gösterme
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          href: null, // Bu ekranı tab bar'da gösterme
         }}
       />
     </Tabs>

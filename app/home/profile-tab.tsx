@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -34,7 +35,7 @@ export default function ProfileScreen() {
       id: '3', 
       title: 'Kaydedilen Kelimeler', 
       icon: 'bookmark',
-      screen: '/home/profile/saved'
+      screen: '/home/saved' // Doğru yolu güncelledik
     },
     { 
       id: '4', 
@@ -51,8 +52,7 @@ export default function ProfileScreen() {
   ];
 
   const navigateTo = (screen: string) => {
-    // router.push(screen);
-    console.log(`Navigating to ${screen}`);
+    router.push(screen);
   };
 
   return (

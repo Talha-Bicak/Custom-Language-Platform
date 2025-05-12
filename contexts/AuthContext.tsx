@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Kullanıcı tipi tanımlama
 type User = {
@@ -8,11 +9,22 @@ type User = {
   email: string;
 };
 
+type Word = {
+  id: string;
+  word: string;
+  meaning: string;
+  example: string;
+  category: string;
+};
+
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  savedWords: Word[];
+  saveWord: (word: Word) => Promise<void>;
+  removeWord: (wordId: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -28,6 +40,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [savedWords, setSavedWords] = useState<Word[]>([]);
 
   useEffect(() => {
     // Başlangıçta oturum durumunu kontrol et
@@ -64,8 +77,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace('/auth/login');
   };
 
+  const loadSavedWords = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('savedWords');
+      if (saved) {
+        setSavedWords(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Kaydedilen kelimeler yüklenirken hata:', error);
+    }
+  };
+
+  const saveWord = async (word: Word) => {
+    try {
+      const updatedWords = [...savedWords, word];
+      await AsyncStorage.setItem('savedWords', JSON.stringify(updatedWords));
+      setSavedWords(updatedWords);
+    } catch (error) {
+      console.error('Kelime kaydedilirken hata:', error);
+    }
+  };
+
+  const removeWord = async (wordId: string) => {
+    try {
+      const updatedWords = savedWords.filter(word => word.id !== wordId);
+      await AsyncStorage.setItem('savedWords', JSON.stringify(updatedWords));
+      setSavedWords(updatedWords);
+    } catch (error) {
+      console.error('Kelime silinirken hata:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, savedWords, saveWord, removeWord }}>
       {children}
     </AuthContext.Provider>
   );

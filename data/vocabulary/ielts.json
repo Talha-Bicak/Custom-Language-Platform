@@ -1,0 +1,16 @@
+{
+  "words": [
+    {
+      "id": "1",
+      "word": "Pervasive",
+      "meaning": "Yaygın, her yerde bulunan",
+      "example": "The pervasive influence of social media affects our daily lives."
+    },
+    {
+      "id": "2",
+      "word": "Ubiquitous",
+      "meaning": "Her yerde bulunan",
+      "example": "Mobile phones are ubiquitous in modern society."
+    }
+  ]
+}
