@@ -1,18 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
+import * as Speech from 'expo-speech';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuth } from '@/contexts/AuthContext';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 // JSON dosyalarını import et
+import generalWords from '@/data/vocabulary/general.json';
 import ieltsWords from '@/data/vocabulary/ielts.json';
 import toeflWords from '@/data/vocabulary/toefl.json';
 import ydsWords from '@/data/vocabulary/yds.json';
-import generalWords from '@/data/vocabulary/general.json';
 
 // Kategori tipleri
 const categories = [
@@ -47,6 +48,16 @@ export default function LearnScreen() {
       category: categories.find(c => c.id === selectedCategory)?.name || 'Genel'
     };
     await saveWord(wordToSave);
+  };
+
+  // Add this new function to handle speaking the word
+  const handleSpeak = (word: string) => {
+    const options = {
+      language: 'en-US', // Set language to English
+      pitch: 1.0,        // Normal pitch
+      rate: 0.9          // Slightly slower for better clarity
+    };
+    Speech.speak(word, options);
   };
 
   // Render kısmında kaydet butonunu güncelleyelim
@@ -123,7 +134,10 @@ export default function LearnScreen() {
                   </ThemedText>
                   
                   <View style={styles.actionButtons}>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity 
+                      style={styles.actionButton}
+                      onPress={() => handleSpeak(item.word)}
+                    >
                       <Ionicons name="volume-medium" size={20} color={Colors[colorScheme ?? 'light'].tint} />
                       <ThemedText style={styles.actionText}>Dinle</ThemedText>
                     </TouchableOpacity>

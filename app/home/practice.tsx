@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -54,9 +55,16 @@ export default function PracticeScreen() {
   const [selectedLevel, setSelectedLevel] = useState('1');
 
   const startQuiz = (quizId: string) => {
-    // Quiz başlatma işlevi
-    console.log(`Quiz ${quizId} at level ${selectedLevel} started`);
-    // router.push('/home/quiz/' + quizId);
+    // Navigation to quiz screen with parameters
+    router.push({
+      pathname: '/home/quiz',
+      params: { 
+        quizId: quizId,
+        levelId: selectedLevel,
+        quizName: quizTypes.find(q => q.id === quizId)?.title || '',
+        levelName: levels.find(l => l.id === selectedLevel)?.name || ''
+      }
+    });
   };
 
   return (

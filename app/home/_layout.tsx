@@ -67,6 +67,12 @@ export default function HomeLayout() {
           href: null, // Bu ekranı tab bar'da gösterme
         }}
       />
+      <Tabs.Screen
+        name="quiz"
+        options={{
+          href: null, // Bu ekranı tab bar'da gösterme
+        }}
+      />
     </Tabs>
   );
 }

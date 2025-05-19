@@ -1,6 +1,6 @@
-import { router } from 'expo-router';
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Kullanıcı tipi tanımlama
 type User = {
@@ -39,15 +39,40 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [savedWords, setSavedWords] = useState<Word[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    // Başlangıçta oturum durumunu kontrol et
-    if (!isAuthenticated) {
-      router.replace('/auth/login');
+    checkAuthStatus();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace('/auth/login');
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isLoading]);
+
+  const checkAuthStatus = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (token) {
+        setIsAuthenticated(true);
+        // Burada token doğrulama işlemi yapılabilir
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      }
+    } catch (error) {
+      console.error('Auth status check failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
