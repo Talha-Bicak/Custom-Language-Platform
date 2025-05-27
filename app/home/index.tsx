@@ -1,18 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import * as Speech from 'expo-speech';
+import React, { useState } from 'react';
+import { Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { generateEnglishPractice } from '@/services/gemini';
 
 export default function HomeScreen() {
   const { logout, user } = useAuth();
   const colorScheme = useColorScheme();
-  
+  const [isPracticeModalVisible, setPracticeModalVisible] = useState(false);
+  const [practiceWord, setPracticeWord] = useState('');
+  const [practiceResult, setPracticeResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleLogout = () => {
     logout();
   };
@@ -23,6 +29,43 @@ export default function HomeScreen() {
 
   const navigateToPractice = () => {
     router.push('/home/practice');
+  };
+
+  const navigateToChat = () => {
+    router.push('/home/chat');
+  };
+
+  const handlePracticeWord = async () => {
+    if (!practiceWord.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      const result = await generateEnglishPractice(practiceWord);
+      setPracticeResult(result);
+      
+      // Speak the conversation
+      await Speech.speak(result.conversation, {
+        language: 'en',
+        pitch: 1.0,
+        rate: 0.9
+      });
+    } catch (error) {
+      console.error('Practice error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSpeak = async (text: string) => {
+    try {
+      await Speech.speak(text, {
+        language: 'en',
+        pitch: 1.0,
+        rate: 0.9
+      });
+    } catch (error) {
+      console.error('Speech error:', error);
+    }
   };
 
   return (
@@ -76,9 +119,12 @@ export default function HomeScreen() {
             <ThemedText style={styles.quickCardText}>Pratik Yap</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.quickCard, { backgroundColor: '#4CAF50' }]}>
-            <Ionicons name="trophy-outline" size={32} color="#FFFFFF" />
-            <ThemedText style={styles.quickCardText}>Sıralamalar</ThemedText>
+          <TouchableOpacity 
+            style={[styles.quickCard, { backgroundColor: '#4CAF50' }]}
+            onPress={navigateToChat}
+          >
+            <Ionicons name="chatbubble-outline" size={32} color="#FFFFFF" />
+            <ThemedText style={styles.quickCardText}>İngilizce Pratik</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.quickCard, { backgroundColor: '#FF9800' }]}>
@@ -107,6 +153,69 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
       </ScrollView>
+
+      {/* İngilizce Pratik Modal */}
+      <Modal
+        visible={isPracticeModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setPracticeModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <ThemedView style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>İngilizce Pratik</ThemedText>
+              <TouchableOpacity onPress={() => setPracticeModalVisible(false)}>
+                <Ionicons name="close" size={24} color={Colors[colorScheme ?? 'light'].text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Bir kelime girin..."
+                value={practiceWord}
+                onChangeText={setPracticeWord}
+                placeholderTextColor={Colors[colorScheme ?? 'light'].text}
+              />
+              <TouchableOpacity 
+                style={[styles.practiceButton, isLoading && styles.disabledButton]}
+                onPress={handlePracticeWord}
+                disabled={isLoading}
+              >
+                <ThemedText style={styles.practiceButtonText}>
+                  {isLoading ? 'Yükleniyor...' : 'Pratik Yap'}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+
+            {practiceResult && (
+              <View style={styles.resultContainer}>
+                <View style={styles.resultSection}>
+                  <ThemedText style={styles.resultTitle}>Konuşma</ThemedText>
+                  <TouchableOpacity 
+                    style={styles.speakButton}
+                    onPress={() => handleSpeak(practiceResult.conversation)}
+                  >
+                    <Ionicons name="volume-high" size={20} color="#FFFFFF" />
+                  </TouchableOpacity>
+                  <ThemedText style={styles.resultText}>{practiceResult.conversation}</ThemedText>
+                </View>
+
+                <View style={styles.resultSection}>
+                  <ThemedText style={styles.resultTitle}>Telaffuz</ThemedText>
+                  <ThemedText style={styles.resultText}>{practiceResult.pronunciation}</ThemedText>
+                </View>
+
+                <View style={styles.resultSection}>
+                  <ThemedText style={styles.resultTitle}>Kullanım</ThemedText>
+                  <ThemedText style={styles.resultText}>{practiceResult.usage}</ThemedText>
+                </View>
+              </View>
+            )}
+          </ThemedView>
+        </View>
+      </Modal>
     </ThemedView>
   );
 }
@@ -240,5 +349,75 @@ const styles = StyleSheet.create({
   lessonDetail: {
     fontSize: 14,
     opacity: 0.7,
-  }
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    maxHeight: '80%',
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  practiceButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.7,
+  },
+  practiceButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  resultContainer: {
+    marginTop: 20,
+  },
+  resultSection: {
+    marginBottom: 20,
+  },
+  resultTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  resultText: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  speakButton: {
+    backgroundColor: '#4A80F0',
+    padding: 8,
+    borderRadius: 20,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
 });

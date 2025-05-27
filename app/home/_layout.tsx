@@ -73,6 +73,12 @@ export default function HomeLayout() {
           href: null, // Bu ekranı tab bar'da gösterme
         }}
       />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          href: null, // Bu ekranı tab bar'da gösterme
+        }}
+      />
     </Tabs>
   );
 }

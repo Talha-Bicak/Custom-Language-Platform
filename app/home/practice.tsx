@@ -7,13 +7,22 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+interface QuizType {
+  id: string;
+  title: string;
+  description: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  questions: number;
+}
+
 // Örnek quiz verileri
-const quizTypes = [
+const quizTypes: QuizType[] = [
   { 
     id: '1', 
     title: 'Çoktan Seçmeli',
     description: 'Verilen kelime için doğru anlamı seçin',
-    icon: 'list',
+    icon: 'list-outline',
     color: '#4A80F0',
     questions: 10
   },
@@ -21,7 +30,7 @@ const quizTypes = [
     id: '2', 
     title: 'Eşleştirme',
     description: 'Kelimeleri anlamları ile eşleştirin',
-    icon: 'git-compare',
+    icon: 'git-compare-outline',
     color: '#7560ED',
     questions: 15
   },
@@ -29,7 +38,7 @@ const quizTypes = [
     id: '3', 
     title: 'Boşluk Doldurma',
     description: 'Cümledeki boşluğa uygun kelimeyi yazın',
-    icon: 'create',
+    icon: 'create-outline',
     color: '#FF9800',
     questions: 8
   },
@@ -37,7 +46,7 @@ const quizTypes = [
     id: '4', 
     title: 'Dinleme Testi',
     description: 'Dinlediğiniz kelimeyi yazın',
-    icon: 'ear',
+    icon: 'ear-outline',
     color: '#4CAF50',
     questions: 12
   },
